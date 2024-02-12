@@ -1,0 +1,17 @@
+{
+  "name": "wallet-generator",
+  "version": "1.0.0",
+  "description": "",
+  "main": "generate.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "algosdk": "^2.7.0",
+    "bottleneck": "^2.19.5",
+    "dotenv": "^16.4.1",
+    "qrcode": "^1.5.3"
+  }
+}

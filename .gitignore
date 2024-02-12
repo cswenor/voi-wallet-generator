@@ -1,0 +1,54 @@
+# Environment variables
+.env
+
+# Node modules
+node_modules/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Directory for dynamically created wallet folders
+wallets_*/
+
+# Directory for potential output files
+/output
+
+# Dependency directories
+jspm_packages/
+bower_components/
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Optional REPL history
+.node_repl_history
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Optional npm log files
+npm-debug.log*
+npm-debug.log*.gz
+
+# Optional Yarn integrity files
+.yarn-integrity
+
+# Optional project's temporary files
+tmp/
+temp/
+
+package-lock.json
