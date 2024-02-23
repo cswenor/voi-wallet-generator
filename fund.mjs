@@ -53,7 +53,7 @@ const viaFundingAmount = parseInt(process.env.VOI_FUNDING_AMOUNT, 10);
 const VIA_APP_ID = parseInt(process.env.VIA_APP_ID, 10);
 
 // Initialize ARC200 Contract instance with VIA_APP_ID
-const contract = new arc200(VIA_APP_ID, algodClient, {
+const contract = new arc200(VIA_APP_ID, algodClient, indexerClient, {
     acc: funderAccount,
     simulate: false, // For testing purposes, set to false for actual transactions
     waitForConfirmation: true,
