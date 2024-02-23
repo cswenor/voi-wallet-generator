@@ -2,19 +2,19 @@ const fs = require('fs');
 const algosdk = require('algosdk');
 const QRCode = require('qrcode');
 
-const numberOfWallets = 10; // Change this to the desired number of wallets
+const numberOfWallets = 2; // Change this to the desired number of wallets
 
 const wallets = [];
 
 async function generateWallet(outputDirectory) {
-  // Generate a new Algorand account
+  // Generate a new Voi account
   const account = algosdk.generateAccount();
 
   // Convert the secret key (sk) to a hex string
   const privateKeyHex = Buffer.from(account.sk).toString('hex');
 
   // Generate the QR code URI using the hex-encoded private key
-  const qrCodeUri = `avm://account/import?encoding=hex&privateKey=${privateKeyHex}`;
+  const qrCodeUri = `avm://account/import?encoding=hex&privatekey=${privateKeyHex}&asset=6779767`;
 
   // Ensure the 'qrcodes' subdirectory exists within the output directory
   const qrCodesDir = `${outputDirectory}/qrcodes`;
