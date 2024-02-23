@@ -2,7 +2,7 @@ import fs from 'fs';
 import algosdk from 'algosdk';
 import QRCode from 'qrcode';
 
-const numberOfWallets = 2; // Change this to the desired number of wallets
+const numberOfWallets = 50; // Change this to the desired number of wallets
 
 const wallets = [];
 

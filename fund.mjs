@@ -53,52 +53,14 @@ const viaFundingAmount = parseInt(process.env.VOI_FUNDING_AMOUNT, 10);
 const VIA_APP_ID = parseInt(process.env.VIA_APP_ID, 10);
 
 // Initialize ARC200 Contract instance with VIA_APP_ID
-const contract = new arc200(VIA_APP_ID, algodClient, {
+const contract = new arc200(VIA_APP_ID, algodClient, indexerClient, {
     acc: funderAccount,
     simulate: false, // For testing purposes, set to false for actual transactions
     waitForConfirmation: true,
     formatBytes: true,
   });
 
-// // Function to list wallet directories and prompt user for selection
-// async function chooseWalletDirectory(baseDir) {
-//     const dirs = fs.readdirSync(baseDir, { withFileTypes: true })
-//         .filter(dirent => dirent.isDirectory())
-//         .map(dirent => dirent.name)
-//         .filter(name => name.startsWith('wallets_'))
-//         .sort()
-//         .reverse();
-
-//     if (dirs.length === 0) {
-//         console.log("No wallet directories found.");
-//         return null;
-//     }
-
-//     const rl = readline.createInterface({
-//         input: process.stdin,
-//         output: process.stdout
-//     });
-
-//     console.log("Available wallet directories:");
-//     dirs.forEach((dir, index) => {
-//         console.log(`${index + 1}: ${dir}`);
-//     });
-
-//     return new Promise((resolve) => {
-//         rl.question('Enter the number of the wallet directory to fund: ', (answer) => {
-//             const dirIndex = parseInt(answer, 10) - 1;
-//             if (dirIndex >= 0 && dirIndex < dirs.length) {
-//                 resolve(path.join(baseDir, dirs[dirIndex]));
-//             } else {
-//                 console.log("Invalid selection.");
-//                 resolve(null);
-//             }
-//             rl.close();
-//         });
-//     });
-// }
-
-// Automatically choosing the first wallet directory without prompting the user
+// Function to list wallet directories and prompt user for selection
 async function chooseWalletDirectory(baseDir) {
     const dirs = fs.readdirSync(baseDir, { withFileTypes: true })
         .filter(dirent => dirent.isDirectory())
@@ -112,8 +74,28 @@ async function chooseWalletDirectory(baseDir) {
         return null;
     }
 
-    // Automatically select the first directory without prompting the user
-    return path.join(baseDir, dirs[0]);
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+    });
+
+    console.log("Available wallet directories:");
+    dirs.forEach((dir, index) => {
+        console.log(`${index + 1}: ${dir}`);
+    });
+
+    return new Promise((resolve) => {
+        rl.question('Enter the number of the wallet directory to fund: ', (answer) => {
+            const dirIndex = parseInt(answer, 10) - 1;
+            if (dirIndex >= 0 && dirIndex < dirs.length) {
+                resolve(path.join(baseDir, dirs[dirIndex]));
+            } else {
+                console.log("Invalid selection.");
+                resolve(null);
+            }
+            rl.close();
+        });
+    });
 }
 
 async function fundWallets() {
