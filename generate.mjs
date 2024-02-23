@@ -1,6 +1,6 @@
-const fs = require('fs');
-const algosdk = require('algosdk');
-const QRCode = require('qrcode');
+import fs from 'fs';
+import algosdk from 'algosdk';
+import QRCode from 'qrcode';
 
 const numberOfWallets = 2; // Change this to the desired number of wallets
 
