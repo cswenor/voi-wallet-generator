@@ -18,12 +18,12 @@ const labelDimensions = {
 
 const margins = {
     top: inchesToPoints(0.5),
-    side: inchesToPoints(0.38),
+    side: inchesToPoints(0.375),
 };
 
 const pitch = {
-    vertical: inchesToPoints(1.13),
-    horizontal: inchesToPoints(1.13),
+    vertical: inchesToPoints(1.125),
+    horizontal: inchesToPoints(1.125),
 };
 
 const numberAcross = 7;
@@ -65,29 +65,32 @@ async function chooseDirectory(baseDir) {
 }
 
 async function createPDFWithQRCodes(walletDir) {
-    const qrCodesDir = path.join(walletDir, 'qrcodes'); // Construct the path to the qrcodes directory
+    const qrCodesDir = path.join(walletDir, 'qrcodes');
     const qrCodeFiles = fs.readdirSync(qrCodesDir).filter(file => file.endsWith('.png'));
-    const pdfPath = path.join(walletDir, 'qr_codes.pdf'); // Save the PDF in the wallet directory
+    const pdfPath = path.join(walletDir, 'qr_codes.pdf');
     const doc = new PDFDocument({ size: [pageDimensions.width, pageDimensions.height], margin: 0 });
-
+  
     doc.pipe(fs.createWriteStream(pdfPath));
-
+  
+    let pageNumber = 0;
     qrCodeFiles.forEach((file, index) => {
-        const row = Math.floor(index / numberAcross) % numberDown;
-        const column = index % numberAcross;
-        const x = margins.side + column * pitch.horizontal;
-        const y = margins.top + row * pitch.vertical;
-
-        if (index > 0 && index % (numberAcross * numberDown) === 0) {
-            doc.addPage();
-        }
-
-        doc.image(path.join(qrCodesDir, file), x, y, { width: labelDimensions.width, height: labelDimensions.height });
+      const positionIndex = index - pageNumber * numberAcross * numberDown;
+      const row = Math.floor(positionIndex / numberAcross);
+      const column = positionIndex % numberAcross;
+      const x = margins.side + column * pitch.horizontal;
+      const y = margins.top + row * pitch.vertical;
+  
+      if (positionIndex > 0 && positionIndex % (numberAcross * numberDown) === 0) {
+        doc.addPage();
+        pageNumber++;
+      }
+  
+      doc.image(path.join(qrCodesDir, file), x, y, { width: labelDimensions.width, height: labelDimensions.height });
     });
-
+  
     doc.end();
     console.log(`PDF created at ${pdfPath} with ${qrCodeFiles.length} QR codes.`);
-}
+  }
 
 async function main() {
     const __filename = fileURLToPath(import.meta.url);
