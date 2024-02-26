@@ -49,7 +49,7 @@ const baseDir = __dirname; // Current directory
 
 // Amount to fund each wallet (in microVoi)
 const voiFundingAmount = parseInt(process.env.VOI_FUNDING_AMOUNT, 10); // example: 100000 microVoi = 0.1 Voi
-const viaFundingAmount = parseInt(process.env.VOI_FUNDING_AMOUNT, 10);
+const viaFundingAmount = parseInt(process.env.VIA_FUNDING_AMOUNT, 10);
 const VIA_APP_ID = parseInt(process.env.VIA_APP_ID, 10);
 
 // Initialize ARC200 Contract instance with VIA_APP_ID
@@ -126,11 +126,30 @@ async function fundWallets() {
     }
 }
 
-async function processWallets(wallets, params, actionFunction) {
+async function processWallets(wallets, params, actionFunction, selectedWalletDir) {
     const sendPromises = wallets.map(wallet => limiter.schedule(() => actionFunction(wallet, params)));
 
     const results = await Promise.allSettled(sendPromises);
-    const failedWallets = results.filter(result => result.status === 'rejected' || (result.value && result.value.error)).map(result => result.value);
+    const failedWallets = [];
+
+    results.forEach((result, index) => {
+        if (result.status === 'fulfilled') {
+            if (result.value && result.value.error) {
+                // If the promise was fulfilled but returned an object indicating an error
+                const errorMessage = result.value.error;
+                console.error(`Failed to process wallet ${wallets[index].publicKey} with ${actionFunction.name}: ${errorMessage}`);
+                failedWallets.push({ publicKey: wallets[index].publicKey, error: errorMessage });
+            } else {
+                // If the promise was fulfilled successfully without indicating an error
+                console.log(`Successfully processed wallet ${wallets[index].publicKey} with ${actionFunction.name}.`);
+            }
+        } else if (result.status === 'rejected') {
+            // If the promise was rejected, log the error and add to failedWallets
+            const errorMessage = result.reason ? result.reason.toString() : 'Unknown error';
+            console.error(`Failed to process wallet ${wallets[index].publicKey} with ${actionFunction.name}: ${errorMessage}`);
+            failedWallets.push({ publicKey: wallets[index].publicKey, error: errorMessage });
+        }
+    });
 
     if (failedWallets.length > 0) {
         const failedWalletsFilePath = path.join(selectedWalletDir, `failed_${actionFunction.name}_wallets.json`);
@@ -140,6 +159,8 @@ async function processWallets(wallets, params, actionFunction) {
         console.log(`All wallets were successfully processed by ${actionFunction.name}.`);
     }
 }
+
+
 
 async function sendFunds(wallet, params) {
     try {
