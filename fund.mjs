@@ -38,7 +38,7 @@ const indexerClient = new algosdk.Indexer(
     INDEXER_TOKEN,
     INDEXER_SERVER,
     INDEXER_PORT
-);
+  );
 
 // Funding account - replace with your mnemonic
 const funderAccountMnemonic = process.env.FUNDER_ACCOUNT_MNEMONIC;
@@ -58,7 +58,7 @@ const contract = new arc200(VIA_APP_ID, algodClient, indexerClient, {
     simulate: false, // For testing purposes, set to false for actual transactions
     waitForConfirmation: true,
     formatBytes: true,
-});
+  });
 
 // Function to list wallet directories and prompt user for selection
 async function chooseWalletDirectory(baseDir) {
@@ -184,44 +184,16 @@ async function sendFunds(wallet, params) {
     }
 }
 
-async function promptForVIAAmount() {
-    const rl = readline.createInterface({
-        input: process.stdin,
-        output: process.stdout
-    });
-
-    return new Promise((resolve) => {
-        rl.question('Enter the amount of VIA to transfer: ', (amount) => {
-            const viaAmount = parseFloat(amount);
-            if (isNaN(viaAmount) || viaAmount <= 0) {
-                console.log("Invalid amount. Please enter a positive number.");
-                rl.close();
-                resolve(null);
-            } else {
-                // Convert VIA to microVIA
-                const microVIAAmount = viaAmount * 1e6;
-                rl.close();
-                resolve(microVIAAmount);
-            }
-        });
-    });
-}
-
 async function sendVIA(wallet, params) {
     try {
-        const viaAmount = await promptForVIAAmount();
-        if (viaAmount === null) {
-            throw new Error("Invalid VIA amount entered. Operation cancelled.");
-        }
-
-        // Transfer tokens to the specified address
-        await contract.arc200_transfer(wallet.publicKey, viaAmount, false, true);
-        console.log(`Successfully sent ${viaAmount / 1e6} VIA to wallet ${wallet.publicKey}`);
+      // Transfer tokens to the specified address
+      await contract.arc200_transfer(wallet.publicKey, viaFundingAmount, false, true);
+      console.log(`Successfully sent VIA to wallet ${wallet.publicKey}`);
     } catch (error) {
-        console.error(`Failed to send VIA to wallet ${wallet.publicKey}: ${error}`);
-        throw { ...wallet, error: error.toString() };
+      console.error(`Failed to send VIA to wallet ${wallet.publicKey}: ${error}`);
+      throw { ...wallet, error: error.toString() };
     }
-}
+  }
 
 // Utility function to wait for transaction confirmation
 async function waitForConfirmation(txId) {
